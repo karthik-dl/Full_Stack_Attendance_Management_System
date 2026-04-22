@@ -64,7 +64,7 @@ router.post("/attendance/mark", auth(["student"]), async (req, res) => {
 
 
 // ================= TRAINER SESSIONS =================
-// 🔥 MUST BE BEFORE /:id/attendance
+//  MUST BE BEFORE /:id/attendance
 router.get("/trainer", auth(["trainer"]), async (req, res) => {
   try {
     const result = await pool.query(
