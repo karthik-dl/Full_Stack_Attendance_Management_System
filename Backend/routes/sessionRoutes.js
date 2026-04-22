@@ -10,11 +10,19 @@ router.post("/", auth(["trainer"]), async (req, res) => {
   const { title, batch_id, date, start_time, end_time } = req.body;
 
   try {
+    if (!batch_id) {
+      return res.status(400).json({ msg: "Batch ID required" });
+    }
+
+    if (!title || !date || !start_time || !end_time) {
+      return res.status(400).json({ msg: "All fields required" });
+    }
+
     const result = await pool.query(
-      `INSERT INTO sessions (title, batch_id, date, start_time, end_time)
-       VALUES ($1,$2,$3,$4,$5)
+      `INSERT INTO sessions (title, batch_id, trainer_id, date, start_time, end_time)
+       VALUES ($1,$2,$3,$4,$5,$6)
        RETURNING *`,
-      [title, batch_id, date, start_time, end_time]
+      [title, batch_id, req.user.id, date, start_time, end_time]
     );
 
     res.json(result.rows[0]);
@@ -60,7 +68,8 @@ router.post("/attendance/mark", auth(["student"]), async (req, res) => {
 router.get("/trainer", auth(["trainer"]), async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT * FROM sessions ORDER BY date DESC`
+      `SELECT * FROM sessions WHERE trainer_id = $1 ORDER BY date DESC`,
+      [req.user.id]
     );
 
     res.json(result.rows);

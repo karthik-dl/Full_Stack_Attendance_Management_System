@@ -1,6 +1,9 @@
 import { useState } from "react";
 import API from "../services/api";
 
+const inputCls =
+  "w-full mb-3 p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-400";
+
 export default function Register() {
   const [form, setForm] = useState({
     name: "",
@@ -15,7 +18,7 @@ export default function Register() {
       alert("Registered!");
       window.location.href = "/";
     } catch {
-      alert("Error");
+      alert("Error registering. Please try again.");
     }
   };
 
@@ -24,17 +27,17 @@ export default function Register() {
       <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-80">
         <h2 className="text-white text-xl mb-4 text-center">Register</h2>
 
-        <input className="input" placeholder="Name"
+        <input className={inputCls} placeholder="Name"
           onChange={(e) => setForm({ ...form, name: e.target.value })} />
 
-        <input className="input" placeholder="Email"
+        <input className={inputCls} placeholder="Email"
           onChange={(e) => setForm({ ...form, email: e.target.value })} />
 
-        <input className="input" type="password" placeholder="Password"
+        <input className={inputCls} type="password" placeholder="Password"
           onChange={(e) => setForm({ ...form, password: e.target.value })} />
 
         <select
-          className="input"
+          className={inputCls}
           onChange={(e) => setForm({ ...form, role: e.target.value })}
         >
           <option value="student">Student</option>
@@ -50,6 +53,10 @@ export default function Register() {
         >
           Register
         </button>
+
+        <p className="text-gray-400 mt-4 text-sm text-center">
+          Have an account? <a href="/" className="text-blue-400">Login</a>
+        </p>
       </div>
     </div>
   );

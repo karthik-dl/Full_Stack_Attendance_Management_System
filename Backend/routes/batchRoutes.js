@@ -1,4 +1,5 @@
 import express from "express";
+import pool from "../config/db.js";
 import {
   createBatch,
   generateInvite,
@@ -18,9 +19,7 @@ router.post("/:id/invite", auth(["trainer"]), generateInvite);
 // Join batch
 router.post("/join/:token", auth(["student"]), joinBatch);
 
-// ✅ NEW: Batch summary
-router.get("/:id/summary", auth(["trainer", "institution"]), getBatchSummary);
-// GET MY BATCHES (STUDENT)
+// GET MY BATCHES (STUDENT) — must be before /:id/summary to avoid wildcard clash
 router.get("/my", auth(["student"]), async (req, res) => {
   try {
     const result = await pool.query(
@@ -37,4 +36,8 @@ router.get("/my", auth(["student"]), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Batch summary — after /my to avoid wildcard swallowing it
+router.get("/:id/summary", auth(["trainer", "institution"]), getBatchSummary);
+
 export default router;
