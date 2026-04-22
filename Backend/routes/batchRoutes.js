@@ -11,8 +11,20 @@ import auth from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // Create batch
-router.post("/", auth(["trainer", "institution"]), createBatch);
+router.post("/", auth(["trainer"]), async (req, res) => {
+  try {
+    const result = await pool.query(
+      `INSERT INTO batches (name, trainer_id)
+       VALUES ($1, $2)
+       RETURNING *`,
+      ["Batch", req.user.id]
+    );
 
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // Invite link
 router.post("/:id/invite", auth(["trainer"]), generateInvite);
 

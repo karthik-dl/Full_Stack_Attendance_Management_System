@@ -10,19 +10,12 @@ router.post("/", auth(["trainer"]), async (req, res) => {
   const { title, batch_id, date, start_time, end_time } = req.body;
 
   try {
-    if (!batch_id) {
-      return res.status(400).json({ msg: "Batch ID required" });
-    }
-
-    if (!title || !date || !start_time || !end_time) {
-      return res.status(400).json({ msg: "All fields required" });
-    }
-
     const result = await pool.query(
-      `INSERT INTO sessions (title, batch_id, trainer_id, date, start_time, end_time)
+      `INSERT INTO sessions 
+       (title, batch_id, date, start_time, end_time, trainer_id)
        VALUES ($1,$2,$3,$4,$5,$6)
        RETURNING *`,
-      [title, batch_id, req.user.id, date, start_time, end_time]
+      [title, batch_id, date, start_time, end_time, req.user.id]
     );
 
     res.json(result.rows[0]);
@@ -38,7 +31,6 @@ router.post("/attendance/mark", auth(["student"]), async (req, res) => {
   const { session_id, status } = req.body;
 
   try {
-    // prevent duplicate
     const check = await pool.query(
       `SELECT * FROM attendance WHERE session_id=$1 AND student_id=$2`,
       [session_id, req.user.id]
@@ -57,39 +49,37 @@ router.post("/attendance/mark", auth(["student"]), async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
 
 // ================= TRAINER SESSIONS =================
-//  MUST BE BEFORE /:id/attendance
 router.get("/trainer", auth(["trainer"]), async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT * FROM sessions WHERE trainer_id = $1 ORDER BY date DESC`,
+      `SELECT s.*, u.name AS trainer_name
+       FROM sessions s
+       JOIN users u ON s.trainer_id = u.id
+       WHERE s.trainer_id = $1
+       ORDER BY s.date DESC`,
       [req.user.id]
     );
 
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
 
-// ================= GET SESSION ATTENDANCE =================
+// ================= SESSION ATTENDANCE =================
 router.get("/:id/attendance", auth(["trainer"]), async (req, res) => {
   const { id } = req.params;
 
   try {
     const result = await pool.query(
-      `SELECT 
-         a.id,
-         a.status,
-         u.name
+      `SELECT a.id, a.status, u.name
        FROM attendance a
        JOIN users u ON a.student_id = u.id
        WHERE a.session_id = $1`,
@@ -98,10 +88,8 @@ router.get("/:id/attendance", auth(["trainer"]), async (req, res) => {
 
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 export default router;
