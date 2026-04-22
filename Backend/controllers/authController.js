@@ -2,7 +2,6 @@ import pool from "../config/db.js";
 import { hash, compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// REGISTER
 export async function register(req, res) {
   const { name, email, password, role } = req.body;
 
@@ -53,19 +52,16 @@ export async function login(req, res) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      {
-        id: user.rows[0].id,
-        role: user.rows[0].role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+   const token = jwt.sign(
+  { id: user.rows[0].id, role: user.rows[0].role },
+  process.env.JWT_SECRET
+);
 
-    res.json({
-      token,
-      role: user.rows[0].role,
-    });
+res.json({
+  token,
+  role: user.rows[0].role,
+  id: user.rows[0].id   // ✅ IMPORTANT
+});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

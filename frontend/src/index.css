@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.input {
+  @apply w-full mb-2 p-2 rounded bg-gray-700 text-white;
+}
