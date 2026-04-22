@@ -44,7 +44,6 @@ export default function TrainerSessions() {
 
       {/* ================= SESSIONS ================= */}
       <div className="bg-gray-800 p-5 rounded-lg shadow">
-
         <h3 className="mb-4 text-lg font-semibold text-white">
           My Sessions
         </h3>
@@ -64,6 +63,7 @@ export default function TrainerSessions() {
                   <th className="text-center py-3 px-3 w-1/5">Date</th>
                   <th className="text-center py-3 px-3 w-1/5">Start</th>
                   <th className="text-center py-3 px-3 w-1/5">End</th>
+                  <th className="text-center py-3 px-3 w-1/5">Trainer</th>
                   <th className="text-center py-3 px-3 w-1/6">Action</th>
                 </tr>
               </thead>
@@ -95,6 +95,11 @@ export default function TrainerSessions() {
                       {s.end_time?.slice(0, 5)}
                     </td>
 
+                    {/* Trainer */}
+                    <td className="py-3 px-3 text-center">
+                      {s.trainer_name}
+                    </td>
+
                     {/* Action */}
                     <td className="py-3 px-3 text-center">
                       <button
@@ -116,7 +121,6 @@ export default function TrainerSessions() {
       {/* ================= ATTENDANCE ================= */}
       {selectedSession && (
         <div className="bg-gray-800 p-5 rounded-lg shadow">
-
           <h3 className="mb-4 text-lg font-semibold text-white">
             Attendance (Session {selectedSession})
           </h3>
